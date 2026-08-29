@@ -16,15 +16,18 @@
       "properties": {
         "clientId": {
           "title": "Client ID",
-          "type": "string"
+          "type": "string",
+          "description": "Google OAuth client ID"
         },
         "clientSecret": {
           "title": "Client Secret",
-          "type": "string"
+          "type": "string",
+          "description": "Google OAuth client secret"
         },
         "refreshToken": {
           "title": "Refresh Token",
-          "type": "string"
+          "type": "string",
+          "description": "Google OAuth refresh token used to upload files"
         },
         "folderId": {
           "title": "Folder ID (optional)",
