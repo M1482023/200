@@ -1,0 +1,39 @@
+{
+  "title": "Magnet to Google Drive",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "magnetUrl": {
+      "title": "Magnet URL",
+      "type": "string",
+      "description": "Magnet link to download",
+      "editor": "textfield"
+    },
+    "googleDrive": {
+      "title": "Google Drive settings",
+      "type": "object",
+      "description": "OAuth credentials and folder settings",
+      "properties": {
+        "clientId": {
+          "title": "Client ID",
+          "type": "string"
+        },
+        "clientSecret": {
+          "title": "Client Secret",
+          "type": "string"
+        },
+        "refreshToken": {
+          "title": "Refresh Token",
+          "type": "string"
+        },
+        "folderId": {
+          "title": "Folder ID (optional)",
+          "type": "string",
+          "description": "Google Drive folder where the ZIP will be uploaded"
+        }
+      },
+      "required": ["clientId", "clientSecret", "refreshToken"]
+    }
+  },
+  "required": ["magnetUrl", "googleDrive"]
+}

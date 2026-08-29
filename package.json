@@ -1,0 +1,16 @@
+{
+  "name": "magnet-drive-uploader",
+  "version": "1.0.0",
+  "description": "Downloads a magnet torrent and uploads a ZIP archive to Google Drive",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js",
+    "test": "echo \"No tests\" && exit 0"
+  },
+  "dependencies": {
+    "apify": "^3.4.0",
+    "webtorrent": "^2.6.0",
+    "googleapis": "^144.0.0",
+    "archiver": "^6.0.0"
+  }
+}
