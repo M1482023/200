@@ -25,13 +25,13 @@
           "title": "Client Secret",
           "type": "string",
           "description": "Google OAuth client secret",
-          "editor": "password"
+          "editor": "textarea"
         },
         "refreshToken": {
           "title": "Refresh Token",
           "type": "string",
           "description": "Google OAuth refresh token used to upload files",
-          "editor": "password"
+          "editor": "textarea"
         },
         "folderId": {
           "title": "Folder ID (optional)",
