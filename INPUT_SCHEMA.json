@@ -13,26 +13,31 @@
       "title": "Google Drive settings",
       "type": "object",
       "description": "OAuth credentials and folder settings",
+      "editor": "json",
       "properties": {
         "clientId": {
           "title": "Client ID",
           "type": "string",
-          "description": "Google OAuth client ID"
+          "description": "Google OAuth client ID",
+          "editor": "textfield"
         },
         "clientSecret": {
           "title": "Client Secret",
           "type": "string",
-          "description": "Google OAuth client secret"
+          "description": "Google OAuth client secret",
+          "editor": "password"
         },
         "refreshToken": {
           "title": "Refresh Token",
           "type": "string",
-          "description": "Google OAuth refresh token used to upload files"
+          "description": "Google OAuth refresh token used to upload files",
+          "editor": "password"
         },
         "folderId": {
           "title": "Folder ID (optional)",
           "type": "string",
-          "description": "Google Drive folder where the ZIP will be uploaded"
+          "description": "Google Drive folder where the ZIP will be uploaded",
+          "editor": "textfield"
         }
       },
       "required": ["clientId", "clientSecret", "refreshToken"]
