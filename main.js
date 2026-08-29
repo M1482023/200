@@ -1,9 +1,13 @@
 const Apify = require('apify');
-const WebTorrent = require('webtorrent');
 const { google } = require('googleapis');
 const fs = require('fs');
 const path = require('path');
 const archiver = require('archiver');
+
+async function getWebTorrent() {
+    const imported = await import('webtorrent');
+    return imported.default || imported;
+}
 
 function zipDirectory(sourceDir, outputFilePath) {
     return new Promise((resolve, reject) => {
@@ -45,6 +49,7 @@ Apify.main(async () => {
     fs.mkdirSync(zipDir, { recursive: true });
 
     console.log('Starting torrent download...');
+    const WebTorrent = await getWebTorrent();
     const client = new WebTorrent();
 
     const torrent = client.add(magnetUrl, { path: downloadDir });
