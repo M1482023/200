@@ -23,13 +23,16 @@ function zipDirectory(sourceDir, outputFilePath) {
 Apify.main(async () => {
     const input = await Apify.getInput();
     const magnetUrl = input?.magnetUrl;
-    const driveConfig = input?.googleDrive;
+    const clientId = input?.clientId;
+    const clientSecret = input?.clientSecret;
+    const refreshToken = input?.refreshToken;
+    const folderId = input?.folderId;
 
     if (!magnetUrl || !magnetUrl.startsWith('magnet:?')) {
         throw new Error('Invalid magnet URL. It must start with magnet:?');
     }
 
-    if (!driveConfig?.clientId || !driveConfig?.clientSecret || !driveConfig?.refreshToken) {
+    if (!clientId || !clientSecret || !refreshToken) {
         throw new Error('Missing Google Drive credentials: clientId, clientSecret, refreshToken are required.');
     }
 
@@ -61,12 +64,12 @@ Apify.main(async () => {
     await zipDirectory(downloadDir, zipPath);
 
     const oauth2Client = new google.auth.OAuth2(
-        driveConfig.clientId,
-        driveConfig.clientSecret
+        clientId,
+        clientSecret
     );
 
     oauth2Client.setCredentials({
-        refresh_token: driveConfig.refreshToken
+        refresh_token: refreshToken
     });
 
     const drive = google.drive({ version: 'v3', auth: oauth2Client });
@@ -75,8 +78,8 @@ Apify.main(async () => {
         name: path.basename(zipPath)
     };
 
-    if (driveConfig.folderId) {
-        metadata.parents = [driveConfig.folderId];
+    if (folderId) {
+        metadata.parents = [folderId];
     }
 
     console.log('Uploading ZIP to Google Drive...');
@@ -94,7 +97,7 @@ Apify.main(async () => {
         fileId: response.data.id,
         fileName: response.data.name,
         webViewLink: response.data.webViewLink || null,
-        folderId: driveConfig.folderId || null,
+        folderId: folderId || null,
         zipPath
     };
 
