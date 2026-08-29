@@ -9,39 +9,30 @@
       "description": "Magnet link to download",
       "editor": "textfield"
     },
-    "googleDrive": {
-      "title": "Google Drive settings",
-      "type": "object",
-      "description": "OAuth credentials and folder settings",
-      "editor": "json",
-      "properties": {
-        "clientId": {
-          "title": "Client ID",
-          "type": "string",
-          "description": "Google OAuth client ID",
-          "editor": "textfield"
-        },
-        "clientSecret": {
-          "title": "Client Secret",
-          "type": "string",
-          "description": "Google OAuth client secret",
-          "editor": "textarea"
-        },
-        "refreshToken": {
-          "title": "Refresh Token",
-          "type": "string",
-          "description": "Google OAuth refresh token used to upload files",
-          "editor": "textarea"
-        },
-        "folderId": {
-          "title": "Folder ID (optional)",
-          "type": "string",
-          "description": "Google Drive folder where the ZIP will be uploaded",
-          "editor": "textfield"
-        }
-      },
-      "required": ["clientId", "clientSecret", "refreshToken"]
+    "clientId": {
+      "title": "Client ID",
+      "type": "string",
+      "description": "Google OAuth client ID",
+      "editor": "textfield"
+    },
+    "clientSecret": {
+      "title": "Client Secret",
+      "type": "string",
+      "description": "Google OAuth client secret",
+      "editor": "textarea"
+    },
+    "refreshToken": {
+      "title": "Refresh Token",
+      "type": "string",
+      "description": "Google OAuth refresh token used to upload files",
+      "editor": "textarea"
+    },
+    "folderId": {
+      "title": "Folder ID (optional)",
+      "type": "string",
+      "description": "Google Drive folder where the ZIP will be uploaded",
+      "editor": "textfield"
     }
   },
-  "required": ["magnetUrl", "googleDrive"]
+  "required": ["magnetUrl", "clientId", "clientSecret", "refreshToken"]
 }
