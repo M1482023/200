@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "apify": "^3.7.0",
-    "webtorrent": "^0.119.1",
+    "webtorrent": "^1.9.7",
     "googleapis": "^144.0.0",
     "archiver": "^6.0.0"
   }
