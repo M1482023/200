@@ -9,9 +9,8 @@
   },
   "dependencies": {
     "apify": "^3.7.0",
-    "webtorrent": "^2.1.34",
+    "webtorrent": "^0.119.1",
     "googleapis": "^144.0.0",
-    "archiver": "^6.0.0",
-    "utp-native": "^2.5.3"
+    "archiver": "^6.0.0"
   }
 }
