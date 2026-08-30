@@ -1,4 +1,4 @@
-const Apify = require('apify');
+const { Actor } = require('apify');
 const { google } = require('googleapis');
 const fs = require('fs');
 const path = require('path');
@@ -24,8 +24,8 @@ function zipDirectory(sourceDir, outputFilePath) {
     });
 }
 
-Apify.main(async () => {
-    const input = await Apify.getInput();
+Actor.main(async () => {
+    const input = await Actor.getInput();
     const magnetUrl = input?.magnetUrl;
     const clientId = input?.clientId;
     const clientSecret = input?.clientSecret;
@@ -106,12 +106,12 @@ Apify.main(async () => {
         zipPath
     };
 
-    await Apify.pushData(result);
+    await Actor.pushData(result);
 
     console.log('Upload complete.');
     console.log(JSON.stringify(result, null, 2));
 
-    await Apify.setValue('OUTPUT', result);
+    await Actor.setValue('OUTPUT', result);
 
     client.destroy();
 });
