@@ -3,11 +3,7 @@ const { google } = require('googleapis');
 const fs = require('fs');
 const path = require('path');
 const archiver = require('archiver');
-
-async function getWebTorrent() {
-    const imported = await import('webtorrent');
-    return imported.default || imported;
-}
+const WebTorrent = require('webtorrent');
 
 function zipDirectory(sourceDir, outputFilePath) {
     return new Promise((resolve, reject) => {
@@ -52,10 +48,21 @@ Actor.main(async () => {
 
     try {
         console.log('Starting torrent download...');
-        const WebTorrent = await getWebTorrent();
         webtorrentClient = new WebTorrent();
 
-        const torrent = webtorrentClient.add(magnetUrl, { path: downloadDir });
+        // Validate magnet URL before adding
+        if (!magnetUrl || typeof magnetUrl !== 'string') {
+            throw new Error('Invalid magnet URL: must be a non-empty string');
+        }
+
+        console.log('Adding torrent:', magnetUrl.substring(0, 50) + '...');
+        
+        let torrent;
+        try {
+            torrent = webtorrentClient.add(magnetUrl, { path: downloadDir });
+        } catch (addError) {
+            throw new Error(`Failed to add torrent: ${addError.message}`);
+        }
 
         // Add timeout for torrent download (30 minutes)
         const downloadTimeout = setTimeout(() => {
