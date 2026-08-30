@@ -48,70 +48,106 @@ Actor.main(async () => {
     fs.mkdirSync(downloadDir, { recursive: true });
     fs.mkdirSync(zipDir, { recursive: true });
 
-    console.log('Starting torrent download...');
-    const WebTorrent = await getWebTorrent();
-    const client = new WebTorrent();
+    let webtorrentClient = null;
 
-    const torrent = client.add(magnetUrl, { path: downloadDir });
+    try {
+        console.log('Starting torrent download...');
+        const WebTorrent = await getWebTorrent();
+        webtorrentClient = new WebTorrent();
 
-    await new Promise((resolve, reject) => {
-        torrent.on('done', () => {
-            console.log('Torrent download finished.');
-            resolve();
+        const torrent = webtorrentClient.add(magnetUrl, { path: downloadDir });
+
+        // Add timeout for torrent download (30 minutes)
+        const downloadTimeout = setTimeout(() => {
+            webtorrentClient.destroy();
+            throw new Error('Torrent download timeout after 30 minutes');
+        }, 30 * 60 * 1000);
+
+        await new Promise((resolve, reject) => {
+            torrent.on('done', () => {
+                clearTimeout(downloadTimeout);
+                console.log('Torrent download finished.');
+                resolve();
+            });
+
+            torrent.on('error', (err) => {
+                clearTimeout(downloadTimeout);
+                reject(new Error(`Torrent error: ${err.message || err}`));
+            });
         });
 
-        torrent.on('error', (err) => {
-            reject(new Error(`Torrent error: ${err.message || err}`));
+        console.log('Creating ZIP archive...');
+        await zipDirectory(downloadDir, zipPath);
+
+        // Verify ZIP was created
+        if (!fs.existsSync(zipPath)) {
+            throw new Error('ZIP file was not created successfully');
+        }
+
+        const oauth2Client = new google.auth.OAuth2(
+            clientId,
+            clientSecret
+        );
+
+        oauth2Client.setCredentials({
+            refresh_token: refreshToken
         });
-    });
 
-    console.log('Creating ZIP archive...');
-    await zipDirectory(downloadDir, zipPath);
+        const drive = google.drive({ version: 'v3', auth: oauth2Client });
 
-    const oauth2Client = new google.auth.OAuth2(
-        clientId,
-        clientSecret
-    );
+        const metadata = {
+            name: path.basename(zipPath)
+        };
 
-    oauth2Client.setCredentials({
-        refresh_token: refreshToken
-    });
+        if (folderId) {
+            metadata.parents = [folderId];
+        }
 
-    const drive = google.drive({ version: 'v3', auth: oauth2Client });
+        console.log('Uploading ZIP to Google Drive...');
+        const response = await drive.files.create({
+            resource: metadata,
+            media: {
+                mimeType: 'application/zip',
+                body: fs.createReadStream(zipPath)
+            },
+            fields: 'id,name,webViewLink'
+        });
 
-    const metadata = {
-        name: path.basename(zipPath)
-    };
+        // Verify upload was successful
+        if (!response.data.id) {
+            throw new Error('Google Drive upload failed - no file ID returned');
+        }
 
-    if (folderId) {
-        metadata.parents = [folderId];
+        const result = {
+            magnetUrl,
+            fileId: response.data.id,
+            fileName: response.data.name,
+            webViewLink: response.data.webViewLink || null,
+            folderId: folderId || null,
+            zipPath
+        };
+
+        await Actor.pushData(result);
+
+        console.log('Upload complete.');
+        console.log(JSON.stringify(result, null, 2));
+
+        await Actor.setValue('OUTPUT', result);
+
+    } finally {
+        // Cleanup
+        if (webtorrentClient) {
+            webtorrentClient.destroy();
+        }
+
+        // Remove temporary directories
+        try {
+            if (fs.existsSync(workDir)) {
+                fs.rmSync(workDir, { recursive: true, force: true });
+                console.log('Cleaned up temporary directories');
+            }
+        } catch (cleanupError) {
+            console.error('Error during cleanup:', cleanupError.message);
+        }
     }
-
-    console.log('Uploading ZIP to Google Drive...');
-    const response = await drive.files.create({
-        resource: metadata,
-        media: {
-            mimeType: 'application/zip',
-            body: fs.createReadStream(zipPath)
-        },
-        fields: 'id,name,webViewLink'
-    });
-
-    const result = {
-        magnetUrl,
-        fileId: response.data.id,
-        fileName: response.data.name,
-        webViewLink: response.data.webViewLink || null,
-        folderId: folderId || null,
-        zipPath
-    };
-
-    await Actor.pushData(result);
-
-    console.log('Upload complete.');
-    console.log(JSON.stringify(result, null, 2));
-
-    await Actor.setValue('OUTPUT', result);
-
-    client.destroy();
 });
